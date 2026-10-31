@@ -80,20 +80,25 @@ export default async function ChartPage({
   const defaultText = 'rgba(128, 128, 128, 0.9)'
   const hasText = Boolean(darkColors.text || whiteColors.text)
   const active = scheme === 'dark' ? darkColors : whiteColors
+  const whiteVars = `--color-bg-default:${whiteColors.bg}${
+    hasText ? `;--color-text-default:${whiteColors.text || defaultText}` : ''
+  }`
+  const darkVars = `--color-bg-default:${darkColors.bg}${
+    hasText ? `;--color-text-default:${darkColors.text || defaultText}` : ''
+  }`
   const style = scheme
     ? `html,body{background-color:${active.bg}}${
         active.text ? `:root,svg[data-color-mode],canvas[data-color-mode]{--color-text-default:${active.text}}` : ''
       }`
     : (dark || white) &&
-      `:root{--color-bg-default:${whiteColors.bg}${
-        hasText ? `;--color-text-default:${whiteColors.text || defaultText}` : ''
-      }}@media(prefers-color-scheme:dark){:root{--color-bg-default:${darkColors.bg}${
-        hasText ? `;--color-text-default:${darkColors.text || defaultText}` : ''
-      }}}`
+      `:root,html[data-color-mode='light']{${whiteVars}}@media(prefers-color-scheme:dark){:root:not([data-color-mode='light']){${darkVars}}}html[data-color-mode='dark']{${darkVars}}`
+  const messageScript =
+    "window.addEventListener('message',function(e){var d=e.data;var s=typeof d==='string'?d:d&&(d.scheme||d.theme||d.colorMode);if(s==='dark'||s==='light'){document.documentElement.dataset.colorMode=s;var el=document.querySelector('svg,canvas');if(el)el.setAttribute('data-color-mode',s)}})"
 
   return (
     <>
       {style && <style>{style}</style>}
+      {!scheme && <script dangerouslySetInnerHTML={{ __html: messageScript }} />}
       <Element
         data={graphEntries}
         count={count}
