@@ -30,7 +30,12 @@ img {
   height: auto;
 }
 
+:root {
+  color-scheme: light dark;
+}
+
 :root,
+html[data-color-mode='light'],
 svg[data-color-mode='light'],
 canvas[data-color-mode='light'] {
   /* --color-text-default: rgba(128, 128, 128, 0.8); */
@@ -49,7 +54,7 @@ canvas[data-color-mode='light'] {
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-color-mode='light']) {
     /* --color-bg-default: #0d1117; */
     --color-bg-default: #191919;
     --color-calendar-graph-day-bg: rgba(128, 128, 128, 0.1); /* #1e2523; */
@@ -65,8 +70,10 @@ canvas[data-color-mode='light'] {
   }
 }
 
+html[data-color-mode='dark'],
 svg[data-color-mode='dark'],
 canvas[data-color-mode='dark'] {
+  --color-bg-default: #191919;
   --color-calendar-graph-day-bg: #222; /* #1e2523; */
   --color-calendar-graph-day-L1-bg: #0e4429;
   --color-calendar-graph-day-L2-bg: #006d32;
