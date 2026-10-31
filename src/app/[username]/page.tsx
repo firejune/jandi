@@ -72,12 +72,21 @@ export default async function ChartPage({
 
   const Element = element === 'canvas' ? Canvas : Chart
   const { scheme, dark, white } = searchParams
-  const darkColor = formatColor(dark, '#191919')
-  const whiteColor = formatColor(white, '#fff')
+  const darkColors = parseColors(dark, '#191919')
+  const whiteColors = parseColors(white, '#fff')
+  const defaultText = 'rgba(128, 128, 128, 0.9)'
+  const hasText = Boolean(darkColors.text || whiteColors.text)
+  const active = scheme === 'dark' ? darkColors : whiteColors
   const style = scheme
-    ? `html,body{background-color:${scheme === 'dark' ? darkColor : whiteColor}}`
+    ? `html,body{background-color:${active.bg}}${
+        active.text ? `:root,svg[data-color-mode],canvas[data-color-mode]{--color-text-default:${active.text}}` : ''
+      }`
     : (dark || white) &&
-      `:root{--color-bg-default:${whiteColor}}@media(prefers-color-scheme:dark){:root{--color-bg-default:${darkColor}}}`
+      `:root{--color-bg-default:${whiteColors.bg}${
+        hasText ? `;--color-text-default:${whiteColors.text || defaultText}` : ''
+      }}@media(prefers-color-scheme:dark){:root{--color-bg-default:${darkColors.bg}${
+        hasText ? `;--color-text-default:${darkColors.text || defaultText}` : ''
+      }}}`
 
   return (
     <>
@@ -87,9 +96,18 @@ export default async function ChartPage({
   )
 }
 
+function parseColors(value: string | undefined, defaultBg: string) {
+  const [bg, text] = (value || '').split(',')
+  return {
+    bg: formatColor(bg, defaultBg),
+    text: text ? formatColor(text, '') : undefined,
+  }
+}
+
 function formatColor(color: string | undefined, fallback: string) {
   if (!color) return fallback
   const trimmed = color.trim()
+  if (!trimmed) return fallback
   return /^(?:[0-9a-fA-F]{3,4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/.test(trimmed) ? `#${trimmed}` : trimmed
 }
 
