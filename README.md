@@ -109,6 +109,8 @@ When embedding Jandi in a custom website or portfolio with its own dark mode tog
    iframe.contentWindow?.postMessage({ scheme: isDark ? 'dark' : 'light' }, '*')
    ```
 
+> For full implementation details on parameter parsing, seasonal themes, and cross-origin iframe synchronization, see [docs/customization-and-theme-sync.md](./docs/customization-and-theme-sync.md).
+
 ---
 
 ## Credits
