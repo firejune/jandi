@@ -73,3 +73,31 @@ canvas[data-color-mode='dark'] {
   --color-calendar-graph-day-L3-bg: #26a641;
   --color-calendar-graph-day-L4-bg: #39d353;
 }
+
+svg[data-halloween='true'],
+canvas[data-halloween='true'],
+svg[data-halloween='true'][data-color-mode='light'],
+canvas[data-halloween='true'][data-color-mode='light'] {
+  --color-calendar-graph-day-L1-bg: #ffee4a;
+  --color-calendar-graph-day-L2-bg: #ffc501;
+  --color-calendar-graph-day-L3-bg: #fe9600;
+  --color-calendar-graph-day-L4-bg: #03001c;
+}
+
+@media (prefers-color-scheme: dark) {
+  svg[data-halloween='true']:not([data-color-mode='light']),
+  canvas[data-halloween='true']:not([data-color-mode='light']) {
+    --color-calendar-graph-day-L1-bg: #631c03;
+    --color-calendar-graph-day-L2-bg: #bd561d;
+    --color-calendar-graph-day-L3-bg: #fa7a18;
+    --color-calendar-graph-day-L4-bg: #fddf68;
+  }
+}
+
+svg[data-halloween='true'][data-color-mode='dark'],
+canvas[data-halloween='true'][data-color-mode='dark'] {
+  --color-calendar-graph-day-L1-bg: #631c03;
+  --color-calendar-graph-day-L2-bg: #bd561d;
+  --color-calendar-graph-day-L3-bg: #fa7a18;
+  --color-calendar-graph-day-L4-bg: #fddf68;
+}

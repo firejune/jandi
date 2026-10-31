@@ -19,6 +19,7 @@ export type ChartProps = {
     showFooter?: boolean
   }
   scheme?: 'light' | 'dark'
+  halloween?: boolean
 }
 
 const boxSize = 10
@@ -33,6 +34,7 @@ const Chart = ({
   username,
   count,
   scheme,
+  halloween,
   options: {
     borderRadius = defaultBorderRadius,
     boxMargin = defaultBoxMargin,
@@ -48,7 +50,13 @@ const Chart = ({
   let lastCountedMonth = 0
 
   return (
-    <svg data-color-mode={scheme} width={width} height={height} viewBox={`0 0 ${width} ${height}`}>
+    <svg
+      data-color-mode={scheme}
+      data-halloween={halloween || undefined}
+      width={width}
+      height={height}
+      viewBox={`0 0 ${width} ${height}`}
+    >
       <g transform={`translate(${canvasMargin}, ${canvasMargin})`}>
         <g transform={`translate(${textWidth}, ${textHeight})`}>
           {data.map((week, x) => (

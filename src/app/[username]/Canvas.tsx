@@ -22,6 +22,7 @@ const Canvas = ({
   username,
   count,
   scheme,
+  halloween,
   options: { boxMargin = defaultBoxMargin, showWeekDays = true, showFooter = true, ...options } = {},
 }: ChartProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -86,7 +87,7 @@ const Canvas = ({
           </Fragment>
         ))}
       </map>
-      <canvas data-color-mode={scheme} ref={canvasRef} hidden />
+      <canvas data-color-mode={scheme} data-halloween={halloween || undefined} ref={canvasRef} hidden />
     </>
   )
 }
