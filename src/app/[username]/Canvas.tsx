@@ -170,7 +170,7 @@ function drawGraph(
   if (showFooter) {
     if (count) {
       ctx.fillText(
-        `${count} contribution${count === '1' ? '' : 's'} in the last year by @${username} on GitHub`,
+        `${count} contribution${count === '1' ? '' : 's'} in the last year by @${username} on GitHub · Jandi`,
         canvasMargin + textWidth,
         graphHeight + 7,
       )

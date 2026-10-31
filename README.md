@@ -1,63 +1,90 @@
-## Jandi
+# 🌱 Jandi
 
-Jandi is a simple project that lets you embed a GitHub user's contribution calendar into any document.
-
-### How to use This in Notion?
-
-1. Create a new Embed block in your any document.
-2. Set the Embed URL to `https://jandi.firejune.io/%USERNAME%` replacing `%USERNAME%` with your GitHub username.
-3. Adjust the size of the embed accordingly.
-4. Bask in its glory!
+**Jandi** (잔디, Korean for *grass/lawn*) lets you embed a responsive GitHub contribution calendar into **Notion**, **personal portfolios**, or any web document via a simple URL.
 
 ![glory](https://i.imgur.com/aU95o4N.png)
 
-### How to change color mode
+---
 
-You can change the color using the `scheme` parameter. Values include `light` and `dark`. If the parameter is not used, it is automatically selected by the system.
+## Quick Start (Notion Embed)
 
-You can also customize the background color (and optionally text color, separated by a comma) for dark and light modes using the `dark` and `white` parameters (default: `dark=#191919`, `white=#fff`).
+1. Type `/embed` in your Notion document to create an **Embed** block.
+2. Enter the URL below, replacing `%USERNAME%` with your GitHub username:
+   ```text
+   https://jandi.firejune.io/%USERNAME%
+   ```
+3. Resize the embed block to fit your layout.
 
-```
+---
+
+## Parameters Reference
+
+All query parameters are optional and can be combined freely.
+
+| Parameter | Default        | Description                                                                                                  |
+| :-------- | :------------- | :----------------------------------------------------------------------------------------------------------- |
+| `scheme`  | `auto`         | Force color mode: `light` or `dark`. When omitted, follows system `prefers-color-scheme`.                    |
+| `dark`    | `#191919`      | Dark mode background color, or `bg,text` (comma-separated) to also customize the text color.                 |
+| `white`   | `#fff`         | Light mode background color, or `bg,text` (comma-separated) to also customize the text color.                |
+| `tz`      | `Asia/Seoul`   | IANA Time Zone identifier (e.g. `UTC`, `America/New_York`, `Europe/London`).                                 |
+| `radius`  | `2`            | Border radius (`rx`/`ry`) of each contribution day cell in pixels.                                           |
+| `margin`  | `3`            | Gap between contribution day cells in pixels.                                                                |
+| `weeks`   | `true`         | Show weekday labels (`Mon`, `Wed`, `Fri`) on the left. Pass `false`, `0`, `hide`, or `none` to hide.         |
+| `footer`  | `true`         | Show total contribution count and `Less / More` legend at the bottom. Pass `false`, `0`, or `hide` to hide. |
+
+---
+
+## Examples
+
+### 1. Color Mode & Custom Palette (`scheme`, `dark`, `white`)
+
+Force dark or light mode explicitly:
+
+```text
 https://jandi.firejune.io/%USERNAME%?scheme=dark
-https://jandi.firejune.io/%USERNAME%?dark=191919&white=ffffff
+https://jandi.firejune.io/%USERNAME%?scheme=light
+```
+
+Customize the background colors for dark and light modes (hex codes can be passed without `#`):
+
+```text
+https://jandi.firejune.io/%USERNAME%?dark=2f3437&white=f7f6f3
+```
+
+Customize both **background color** and **text color** by separating two colors with a comma (`bg,text`):
+
+```text
 https://jandi.firejune.io/%USERNAME%?dark=000000,ffffff&white=ffffff,000000
+https://jandi.firejune.io/%USERNAME%?dark=transparent,9ca3af&white=transparent,4b5563
 ```
 
-### Can I change the Time Zone?
+### 2. Time Zone (`tz`)
 
-Yes, You can set the specific Time Zone. If the Time Zone is not set, it operates as UTC+0.
+Set a specific IANA time zone (defaults to `Asia/Seoul`):
 
-```
+```text
 https://jandi.firejune.io/%USERNAME%?tz=America/New_York
 ```
 
-### How to customize chart style?
+### 3. Graph Layout (`radius`, `margin`, `weeks`, `footer`)
 
-You can change the style of your graph. Supported properties include:
+Adjust cell rounding, spacing, or hide the weekday labels and footer:
 
-- `radius` - Adjusts the border-radius value of the rectangular elements of the graph. default = 2
-- `margin` - Adjusts the margin value between the rectangular elements of the graph. default = 3
-- `footer` - You can hide the meta information shown at the bottom of the graph. default = true
-- `weeks` - You can hide the day information on the left side of the graph. default = true
-
-```
+```text
 https://jandi.firejune.io/%USERNAME%?radius=3&margin=2&footer=false&weeks=false
 ```
 
-### How to export to PNG image
+### 4. Canvas / PNG Mode (`/canvas`)
 
-You can use Canvas with Embed method as an alternative. This Canvas can be saved as PNG images with transparency. However, depending on the system, the font shape or size may vary slightly.
+Render the contribution calendar onto an HTML `<canvas>` converted to a transparent PNG with clickable `<map>` areas:
 
-```
+```text
 https://jandi.firejune.io/%USERNAME%/canvas
 ```
 
-### Credit
+---
 
-This project was inspired by the following project::
+## Credits
 
-@bizarre's [notion-github-embed](https://github.com/bizarre/notion-github-embed) is easy embed GitHub contribution chart into any Notion document.
-
-@sallar's [github-contributions-chart](https://github.com/sallar/github-contributions-chart) is used to fetch GitHub user contributions. <3
-
-@sallar's [github-contributions-canvas](https://github.com/sallar/github-contributions-canvas) is drawing a heat-map of Github contributions on HTML Canvas
+- Inspired by [@bizarre](https://github.com/bizarre)'s [notion-github-embed](https://github.com/bizarre/notion-github-embed)
+- Powered by patterns from [@sallar](https://github.com/sallar)'s [github-contributions-chart](https://github.com/sallar/github-contributions-chart) and [github-contributions-canvas](https://github.com/sallar/github-contributions-canvas)

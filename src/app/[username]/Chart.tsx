@@ -47,23 +47,6 @@ const Chart = ({
   const width = data.length * (boxSize + boxMargin) + textWidth + canvasMargin
   let lastCountedMonth = 0
 
-  const queryParams = new URLSearchParams()
-
-  if (borderRadius !== defaultBorderRadius) {
-    queryParams.append('radius', borderRadius.toString())
-  }
-  if (boxMargin !== defaultBoxMargin) {
-    queryParams.append('margin', boxMargin.toString())
-  }
-  if (!showWeekDays) {
-    queryParams.append('weeks', 'false')
-  }
-  if (!showFooter) {
-    queryParams.append('footer', 'false')
-  }
-
-  const stringifiedParams = queryParams.toString() && `?${queryParams}`
-
   return (
     <svg data-color-mode={scheme} width={width} height={height} viewBox={`0 0 ${width} ${height}`}>
       <g transform={`translate(${canvasMargin}, ${canvasMargin})`}>
@@ -138,11 +121,15 @@ const Chart = ({
 
         {showFooter && count && (
           <g transform={`translate(${textWidth}, ${chartHeight - textHeight})`}>
-            <a href={`https://jandi.firejune.io/${username}${stringifiedParams}`} target="jandi">
-              <text dy={textHeight} style={{ fontSize }} fill="var(--color-text-default)">
+            <text dy={textHeight} style={{ fontSize }} fill="var(--color-text-default)">
+              <a href={`https://github.com/${username}`} target="jandi">
                 {`${count} contribution${count === '1' ? '' : 's'} in the last year by @${username} on GitHub`}
-              </text>
-            </a>
+              </a>
+              {' · '}
+              <a href="https://github.com/firejune/jandi" target="jandi">
+                Jandi
+              </a>
+            </text>
           </g>
         )}
 
