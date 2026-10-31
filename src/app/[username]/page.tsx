@@ -28,6 +28,7 @@ type PageProps = {
     scheme: 'light' | 'dark'
     dark: string
     white: string
+    halloween: string
     radius: string
     margin: string
     footer: string
@@ -72,6 +73,8 @@ export default async function ChartPage({
 
   const Element = element === 'canvas' ? Canvas : Chart
   const { scheme, dark, white } = searchParams
+  const isHalloweenDay = format(presentDate, 'MM-dd') === '10-31'
+  const halloween = searchParams.halloween ? !FALSY.includes(searchParams.halloween) : isHalloweenDay
   const darkColors = parseColors(dark, '#191919')
   const whiteColors = parseColors(white, '#fff')
   const defaultText = 'rgba(128, 128, 128, 0.9)'
@@ -91,7 +94,14 @@ export default async function ChartPage({
   return (
     <>
       {style && <style>{style}</style>}
-      <Element data={graphEntries} count={count} username={username} scheme={scheme} options={options} />
+      <Element
+        data={graphEntries}
+        count={count}
+        username={username}
+        scheme={scheme}
+        halloween={halloween}
+        options={options}
+      />
     </>
   )
 }
