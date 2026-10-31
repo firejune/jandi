@@ -15,8 +15,11 @@ Jandi is a simple project that lets you embed a GitHub user's contribution calen
 
 You can change the color using the `scheme` parameter. Values include `light` and `dark`. If the parameter is not used, it is automatically selected by the system.
 
+You can also customize the background color for dark and light modes using the `dark` and `white` parameters (default: `dark=#191919`, `white=#fff`).
+
 ```
 https://jandi.firejune.io/%USERNAME%?scheme=dark
+https://jandi.firejune.io/%USERNAME%?dark=191919&white=ffffff
 ```
 
 ### Can I change the Time Zone?
