@@ -26,6 +26,8 @@ type PageProps = {
   }
   searchParams: {
     scheme: 'light' | 'dark'
+    dark: string
+    white: string
     radius: string
     margin: string
     footer: string
@@ -69,13 +71,26 @@ export default async function ChartPage({
   }
 
   const Element = element === 'canvas' ? Canvas : Chart
-  const scheme = searchParams.scheme
+  const { scheme, dark, white } = searchParams
+  const darkColor = formatColor(dark, '#191919')
+  const whiteColor = formatColor(white, '#fff')
+  const style = scheme
+    ? `html,body{background-color:${scheme === 'dark' ? darkColor : whiteColor}}`
+    : (dark || white) &&
+      `:root{--color-bg-default:${whiteColor}}@media(prefers-color-scheme:dark){:root{--color-bg-default:${darkColor}}}`
+
   return (
     <>
-      {scheme && <style>{`body{background-color:${scheme === 'dark' ? '#191919' : '#fff'}}`}</style>}
+      {style && <style>{style}</style>}
       <Element data={graphEntries} count={count} username={username} scheme={scheme} options={options} />
     </>
   )
+}
+
+function formatColor(color: string | undefined, fallback: string) {
+  if (!color) return fallback
+  const trimmed = color.trim()
+  return /^(?:[0-9a-fA-F]{3,4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/.test(trimmed) ? `#${trimmed}` : trimmed
 }
 
 async function getData<T>(url: string): Promise<{ data: T }> {
