@@ -89,6 +89,26 @@ Render the contribution calendar onto an HTML `<canvas>` converted to a transpar
 https://jandi.firejune.io/%USERNAME%/canvas
 ```
 
+### 5. Dynamic Theme Sync (Parent Site Dark Mode Toggle)
+
+When embedding Jandi in a custom website or portfolio with its own dark mode toggle (omit the `scheme` parameter so Jandi stays in `auto` mode):
+
+1. **Zero-JS via CSS `color-scheme` (Recommended):**
+   Set `color-scheme: light` and `color-scheme: dark` on your parent page's theme container (or directly on the `<iframe>`). Modern browsers automatically propagate `prefers-color-scheme` into the embedded Jandi `<iframe>` without reloading.
+   ```css
+   :root {
+     color-scheme: light;
+   }
+   .dark-mode {
+     color-scheme: dark;
+   }
+   ```
+2. **Via `window.postMessage`:**
+   You can also broadcast theme changes to the `<iframe>`:
+   ```js
+   iframe.contentWindow?.postMessage({ scheme: isDark ? 'dark' : 'light' }, '*')
+   ```
+
 ---
 
 ## Credits

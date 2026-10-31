@@ -38,7 +38,8 @@ const Canvas = ({
   const handleResize = () => imageRef.current && setScale(imageRef.current.offsetWidth / width)
 
   useEffect(() => {
-    if (canvasRef.current) {
+    const renderCanvas = () => {
+      if (!canvasRef.current) return
       const canvas = canvasRef.current
       canvas.width = width * scaleFactor
       canvas.height = height * scaleFactor
@@ -55,9 +56,32 @@ const Canvas = ({
       setUrl(canvas.toDataURL())
     }
 
+    const handleMessage = (event: MessageEvent) => {
+      if (scheme) return
+      const payload = event.data
+      const nextScheme =
+        typeof payload === 'string' ? payload : payload && (payload.scheme || payload.theme || payload.colorMode)
+      if (nextScheme === 'dark' || nextScheme === 'light') {
+        document.documentElement.dataset.colorMode = nextScheme
+        if (canvasRef.current) {
+          canvasRef.current.dataset.colorMode = nextScheme
+        }
+        renderCanvas()
+      }
+    }
+
+    renderCanvas()
     handleResize()
+
+    const media = window.matchMedia('(prefers-color-scheme: dark)')
+    media.addEventListener('change', renderCanvas)
+    window.addEventListener('message', handleMessage)
     window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
+    return () => {
+      media.removeEventListener('change', renderCanvas)
+      window.removeEventListener('message', handleMessage)
+      window.removeEventListener('resize', handleResize)
+    }
   }, [])
 
   return (
