@@ -117,3 +117,7 @@ When embedding Jandi in a custom website or portfolio with its own dark mode tog
 
 - Inspired by [@bizarre](https://github.com/bizarre)'s [notion-github-embed](https://github.com/bizarre/notion-github-embed)
 - Powered by patterns from [@sallar](https://github.com/sallar)'s [github-contributions-chart](https://github.com/sallar/github-contributions-chart) and [github-contributions-canvas](https://github.com/sallar/github-contributions-canvas)
+
+## License
+
+[MIT](LICENSE)
