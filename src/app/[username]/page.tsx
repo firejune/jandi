@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import format from 'date-fns/format'
 import startOfWeek from 'date-fns/startOfWeek'
 import isAfter from 'date-fns/isAfter'
@@ -6,7 +7,7 @@ import addWeeks from 'date-fns/addWeeks'
 import addDays from 'date-fns/addDays'
 import differenceInCalendarWeeks from 'date-fns/differenceInCalendarWeeks'
 
-import Chart, { Contrib } from './Chart'
+import Chart, { Contrib, ChartProps } from './Chart'
 import Canvas from './Canvas'
 
 const DATE_FORMAT = 'yyyy-MM-dd'
@@ -38,32 +39,29 @@ type PageProps = {
   }
 }
 
-export default async function ChartPage({
+export default function ChartPage({
   params: { username, element },
   searchParams: { tz: timeZone = 'Asia/Seoul', ...searchParams },
 }: PageProps) {
   const force = searchParams.v || `${Date.now()}`.substring(0, 8)
-  const { data } = await getData<DataStruct>(`${HOST}/api/v1/${username}${force ? `?v=${force}` : ''}`)
   const presentDate = new Date(new Date().toLocaleString('en', { timeZone }))
   let pastDate = startOfWeek(addMonths(presentDate, -12))
   if (differenceInCalendarWeeks(presentDate, pastDate) > 52) {
     pastDate = addWeeks(pastDate, 1)
   }
 
-  const graphEntries = Array.from({ length: 53 }).map(
+  const emptyEntries = Array.from({ length: 53 }).map(
     () =>
       Array.from({ length: 7 })
         .map(() => {
           const date = format(pastDate, DATE_FORMAT)
           if (isAfter(pastDate, presentDate)) return null
           pastDate = addDays(pastDate, 1)
-          // return { date, count: 0}
-          return getDateContrib(data, date) || { date }
+          return { date }
         })
         .filter(contrib => contrib) as Contrib[],
   )
 
-  const count = new Intl.NumberFormat().format(data.total)
   const options = {
     ...(searchParams.weeks ? { showWeekDays: !FALSY.includes(searchParams.weeks) } : {}),
     ...(searchParams.footer ? { showFooter: !FALSY.includes(searchParams.footer) } : {}),
@@ -71,7 +69,6 @@ export default async function ChartPage({
     ...(searchParams.margin ? { boxMargin: Number(searchParams.margin) } : {}),
   }
 
-  const Element = element === 'canvas' ? Canvas : Chart
   const { scheme, dark, white } = searchParams
   const isHalloweenDay = format(presentDate, 'MM-dd') === '10-31'
   const halloween = searchParams.halloween ? !FALSY.includes(searchParams.halloween) : isHalloweenDay
@@ -99,15 +96,56 @@ export default async function ChartPage({
     <>
       {style && <style>{style}</style>}
       {!scheme && <script dangerouslySetInnerHTML={{ __html: messageScript }} />}
-      <Element
-        data={graphEntries}
-        count={count}
-        username={username}
-        scheme={scheme}
-        halloween={halloween}
-        options={options}
-      />
+      <Suspense
+        fallback={
+          <Chart data={emptyEntries} username={username} scheme={scheme} halloween={halloween} options={options} />
+        }
+      >
+        <ChartContent
+          username={username}
+          element={element}
+          force={force}
+          emptyEntries={emptyEntries}
+          scheme={scheme}
+          halloween={halloween}
+          options={options}
+        />
+      </Suspense>
     </>
+  )
+}
+
+async function ChartContent({
+  username,
+  element,
+  force,
+  emptyEntries,
+  scheme,
+  halloween,
+  options,
+}: {
+  username: string
+  element: 'svg' | 'canvas'
+  force: string
+  emptyEntries: Contrib[][]
+  scheme?: 'light' | 'dark'
+  halloween?: boolean
+  options: ChartProps['options']
+}) {
+  const { data } = await getData<DataStruct>(`${HOST}/api/v1/${username}${force ? `?v=${force}` : ''}`)
+  const graphEntries = emptyEntries.map(week => week.map(day => getDateContrib(data, day.date) || day))
+  const count = new Intl.NumberFormat().format(data.total)
+  const Element = element === 'canvas' ? Canvas : Chart
+
+  return (
+    <Element
+      data={graphEntries}
+      count={count}
+      username={username}
+      scheme={scheme}
+      halloween={halloween}
+      options={options}
+    />
   )
 }
 
