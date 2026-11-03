@@ -74,11 +74,16 @@ html[data-color-mode='dark'],
 svg[data-color-mode='dark'],
 canvas[data-color-mode='dark'] {
   --color-bg-default: #191919;
-  --color-calendar-graph-day-bg: #222; /* #1e2523; */
-  --color-calendar-graph-day-L1-bg: #0e4429;
-  --color-calendar-graph-day-L2-bg: #006d32;
-  --color-calendar-graph-day-L3-bg: #26a641;
+  --color-calendar-graph-day-bg: rgba(128, 128, 128, 0.1); /* #1e2523; */
+  --color-calendar-graph-day-L1-bg: rgba(10, 108, 44, 0.4); /* #0e4429; */
+  --color-calendar-graph-day-L2-bg: rgba(29, 160, 51, 0.55); /* #006d32; */
+  --color-calendar-graph-day-L3-bg: rgba(65, 211, 91, 0.8); /* #26a641; */
   --color-calendar-graph-day-L4-bg: #39d353;
+  --color-calendar-graph-day-border: rgba(27, 31, 35, 0.06);
+  --color-calendar-graph-day-L1-border: rgba(255, 255, 255, 0.05);
+  --color-calendar-graph-day-L2-border: rgba(255, 255, 255, 0.05);
+  --color-calendar-graph-day-L3-border: rgba(255, 255, 255, 0.05);
+  --color-calendar-graph-day-L4-border: rgba(255, 255, 255, 0.05);
 }
 
 svg[data-halloween='true'],
