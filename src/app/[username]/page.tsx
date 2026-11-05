@@ -88,13 +88,13 @@ export default function ChartPage({
         active.text ? `:root,svg[data-color-mode],canvas[data-color-mode]{--color-text-default:${active.text}}` : ''
       }`
     : (dark || white) &&
-      `:root,html[data-color-mode='light']{${whiteVars}}@media(prefers-color-scheme:dark){:root:not([data-color-mode='light']){${darkVars}}}html[data-color-mode='dark']{${darkVars}}`
+      `:root,html[data-color-mode=light]{${whiteVars}}@media(prefers-color-scheme:dark){:root:not([data-color-mode=light]){${darkVars}}}html[data-color-mode=dark]{${darkVars}}`
   const messageScript =
     "window.addEventListener('message',function(e){var d=e.data;var s=typeof d==='string'?d:d&&(d.scheme||d.theme||d.colorMode);if(s==='dark'||s==='light'){document.documentElement.dataset.colorMode=s;var el=document.querySelector('svg,canvas');if(el)el.setAttribute('data-color-mode',s)}})"
 
   return (
     <>
-      {style && <style>{style}</style>}
+      {style && <style dangerouslySetInnerHTML={{ __html: style }} />}
       {!scheme && <script dangerouslySetInnerHTML={{ __html: messageScript }} />}
       <Suspense
         fallback={
