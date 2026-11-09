@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { load, Element } from 'cheerio'
 
 // Abort before the serverless function limit (10s) so failures return a response instead of a gateway timeout.
-const GITHUB_TIMEOUT_MS = 8000
+const GITHUB_TIMEOUT_MS = 6000
 
 type Params = {
   params: {
