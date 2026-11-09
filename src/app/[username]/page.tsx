@@ -13,6 +13,8 @@ import Canvas from './Canvas'
 const DATE_FORMAT = 'yyyy-MM-dd'
 const FALSY = ['0', 'false', 'hide', 'hidden', 'none']
 const HOST = process.env.API_HOST
+// Longer than the API's own GitHub timeout, shorter than the function limit.
+const API_TIMEOUT_MS = 9000
 
 type DataStruct = {
   total: number
@@ -132,10 +134,17 @@ async function ChartContent({
   halloween?: boolean
   options: ChartProps['options']
 }) {
-  const { data } = await getData<DataStruct>(`${HOST}/api/v1/${username}${force ? `?v=${force}` : ''}`)
+  const Element = element === 'canvas' ? Canvas : Chart
+  let data: DataStruct
+  try {
+    ;({ data } = await getData<DataStruct>(`${HOST}/api/v1/${username}${force ? `?v=${force}` : ''}`))
+  } catch (error) {
+    // GitHub outages must not take the page down: keep the empty graph the Suspense fallback already shows.
+    console.error('Contributions unavailable', username, error)
+    return <Element data={emptyEntries} username={username} scheme={scheme} halloween={halloween} options={options} />
+  }
   const graphEntries = emptyEntries.map(week => week.map(day => getDateContrib(data, day.date) || day))
   const count = new Intl.NumberFormat().format(data.total)
-  const Element = element === 'canvas' ? Canvas : Chart
 
   return (
     <Element
@@ -165,9 +174,9 @@ function formatColor(color: string | undefined, fallback: string) {
 }
 
 async function getData<T>(url: string): Promise<{ data: T }> {
-  const res = await fetch(url)
+  const res = await fetch(url, { signal: AbortSignal.timeout(API_TIMEOUT_MS) })
   if (!res.ok) {
-    throw new Error('Failed to fetch data')
+    throw new Error(`Failed to fetch data: ${res.status}`)
   }
   const data = await res.json()
   return { data }
