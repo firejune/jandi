@@ -15,6 +15,9 @@ const FALSY = ['0', 'false', 'hide', 'hidden', 'none']
 const HOST = process.env.API_HOST
 // Longer than the API's own GitHub timeout, shorter than the function limit.
 const API_TIMEOUT_MS = 7000
+// Data cache window. Next stores only 200 responses and serves a stale entry while revalidating in the
+// background, and a failed revalidation keeps the entry, so GitHub outages show the last good graph.
+const REVALIDATE_SECONDS = 60
 
 type DataStruct = {
   total: number
@@ -45,7 +48,8 @@ export default function ChartPage({
   params: { username, element },
   searchParams: { tz: timeZone = 'Asia/Seoul', ...searchParams },
 }: PageProps) {
-  const force = searchParams.v || `${Date.now()}`.substring(0, 8)
+  // A stable API URL is the cache key that keeps the last good data; `v` still busts it on demand.
+  const force = searchParams.v
   const presentDate = new Date(new Date().toLocaleString('en', { timeZone }))
   let pastDate = startOfWeek(addMonths(presentDate, -12))
   if (differenceInCalendarWeeks(presentDate, pastDate) > 52) {
@@ -128,7 +132,7 @@ async function ChartContent({
 }: {
   username: string
   element: 'svg' | 'canvas'
-  force: string
+  force?: string
   emptyEntries: Contrib[][]
   scheme?: 'light' | 'dark'
   halloween?: boolean
@@ -139,7 +143,7 @@ async function ChartContent({
   try {
     ;({ data } = await getData<DataStruct>(`${HOST}/api/v1/${username}${force ? `?v=${force}` : ''}`))
   } catch (error) {
-    // GitHub outages must not take the page down: keep the empty graph the Suspense fallback already shows.
+    // Nothing cached yet and GitHub is failing: keep the empty graph the Suspense fallback already shows.
     console.error('Contributions unavailable', username, error)
     return <Element data={emptyEntries} username={username} scheme={scheme} halloween={halloween} options={options} />
   }
@@ -174,7 +178,10 @@ function formatColor(color: string | undefined, fallback: string) {
 }
 
 async function getData<T>(url: string): Promise<{ data: T }> {
-  const res = await fetch(url, { signal: AbortSignal.timeout(API_TIMEOUT_MS) })
+  const res = await fetch(url, {
+    signal: AbortSignal.timeout(API_TIMEOUT_MS),
+    next: { revalidate: REVALIDATE_SECONDS },
+  })
   if (!res.ok) {
     throw new Error(`Failed to fetch data: ${res.status}`)
   }
