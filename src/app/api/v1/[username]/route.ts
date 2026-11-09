@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { load, Element } from 'cheerio'
 
+// Abort before the serverless function limit (10s) so failures return a response instead of a gateway timeout.
+const GITHUB_TIMEOUT_MS = 8000
+
 type Params = {
   params: {
     username: string
@@ -11,10 +14,27 @@ export async function GET(request: NextRequest, { params: { username } }: Params
   const v = request.nextUrl.searchParams.get('v')
   console.log('GET', `/api/v1/${username}${v ? `?v=${v}` : ''}`)
 
-  const data = await fetch(`https://github.com/users/${username}/contributions${v ? `?v=${v}` : ''}`)
+  let data: Response
+  try {
+    data = await fetch(`https://github.com/users/${username}/contributions${v ? `?v=${v}` : ''}`, {
+      signal: AbortSignal.timeout(GITHUB_TIMEOUT_MS),
+    })
+  } catch (error) {
+    console.error('GitHub fetch failed', username, error)
+    return upstreamError(504, 'GitHub contributions request timed out')
+  }
+  if (!data.ok) {
+    console.error('GitHub responded', data.status, username)
+    return upstreamError(data.status === 404 ? 404 : 502, `GitHub contributions responded ${data.status}`)
+  }
+
   const $ = load(await data.text())
   const $days = $('table.ContributionCalendar-grid td.ContributionCalendar-day')
   const $graph = $('div.js-calendar-graph').get(0)
+  if (!$graph) {
+    console.error('GitHub contributions markup not found', username)
+    return upstreamError(502, 'GitHub contributions markup not found')
+  }
   const contribText = $('.js-yearly-contributions h2')
     .text()
     .trim()
@@ -51,4 +71,8 @@ export async function GET(request: NextRequest, { params: { username } }: Params
   }
 
   return NextResponse.json(struct)
+}
+
+function upstreamError(status: number, error: string) {
+  return NextResponse.json({ error }, { status, headers: { 'Cache-Control': 'no-store' } })
 }
