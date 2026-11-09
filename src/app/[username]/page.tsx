@@ -14,7 +14,7 @@ const DATE_FORMAT = 'yyyy-MM-dd'
 const FALSY = ['0', 'false', 'hide', 'hidden', 'none']
 const HOST = process.env.API_HOST
 // Longer than the API's own GitHub timeout, shorter than the function limit.
-const API_TIMEOUT_MS = 9000
+const API_TIMEOUT_MS = 7000
 
 type DataStruct = {
   total: number
